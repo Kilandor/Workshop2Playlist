@@ -1,0 +1,168 @@
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
+using BepInEx;
+using BepInEx.Logging;
+using Newtonsoft.Json.Linq;
+using ZeepkistClient;
+using ZeepSDK.Messaging;
+using ZeepSDK.Multiplayer;
+using static Workshop2Playlist.Plugin;
+
+namespace Workshop2Playlist;
+
+public enum LogLevel
+{
+    Info = 0,
+    Warning = 1,
+    Debug = 2,
+    Error = 3
+}
+
+public class Utilities
+{
+    //Check to see if we are the host
+    public Utilities()
+    {
+    }
+
+    public static bool IsOnlineHost()
+    {
+        return ZeepkistNetwork.IsConnectedToGame && ZeepkistNetwork.IsMasterClient;
+    }
+    
+    /*
+     * Level 0 - info/normal
+     * Level 1 - Warning
+     * Level 2 - Debug
+     * Level 3 - Error
+     */
+    public static void Log(string message, LogLevel level = LogLevel.Info)
+    {
+        ManualLogSource Logger = Plugin.Logger;
+        switch (level)
+        {
+            default:
+            case LogLevel.Info:
+                Logger.LogInfo(message);
+                break;
+            case LogLevel.Warning:
+                Logger.LogWarning(message);
+                break;
+            case LogLevel.Debug:
+                if (Instance.debugEnabled.Value)
+                    Logger.LogDebug(message);
+                break;
+            case LogLevel.Error:
+                Logger.LogError(message);
+                break;
+        }
+    }
+    
+    //quickly format chat messages
+    public static Dictionary<string, string> formatChatMessage(string prefix, string message,
+        bool prefixBrackets = true, string prefixColor = "#18a81e", string messageColor = "#FFC531")
+    {
+        if (prefixBrackets)
+            prefix = "[<color=" + prefixColor + ">" + prefix + "</color>]";
+        else
+            prefix = "<color=" + prefixColor + ">" + prefix + "</color>";
+        return new Dictionary<string, string>
+        {
+            { "prefix", prefix },
+            { "message", "<color=" + messageColor + ">" + message + "</color>" }
+        };
+    }
+
+    //wraper for Custom messages
+    public static void sendCustomChatMessage(bool everyone, ulong steamid = 0, string message = "",
+        string prefix = "")
+    {
+        ZeepkistNetwork.SendCustomChatMessage(everyone, steamid, message, prefix);
+    }
+    
+    //handle working with On screen Messsages
+    public static void sendMessenger(string message, float duration, LogLevel type, string prefix = "",  bool usePrefix = false)
+    {
+        Dictionary<string, string> chatMessage = formatChatMessage(prefix, message);
+        chatMessage["message"] = (usePrefix ? string.Join(",", chatMessage) : chatMessage["message"]);
+        if(type == LogLevel.Info)
+            MessengerApi.LogSuccess(chatMessage["message"], duration);
+        else if(type == LogLevel.Error)
+            MessengerApi.LogError(chatMessage["message"], duration);
+    }
+
+    public static async Task<bool> addWorkshopItem(string workshopUrl)
+    {
+        string apiUrlBase = "https://zeepkist.kilandor.com/workshop2playlist/index.php?workshopUrl=";
+        using HttpClient client = new HttpClient();
+        client.Timeout = TimeSpan.FromSeconds(60);
+        try
+        {
+            // Fetch the API response
+            HttpResponseMessage response = await client.GetAsync(apiUrlBase+Uri.EscapeDataString(workshopUrl));
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
+
+            // Parse JSON
+            JObject data = JObject.Parse(responseBody);
+
+            // Extract Steam status
+            string status = data["status"]?.ToString();
+            if (status == "success")
+            {
+                JArray levels = (JArray?)data["levels"];
+                if (levels != null)
+                {
+                    string lastAuthor = "";
+                    string lastTrack = "";
+                    foreach (JObject level in levels)
+                    {
+                        string uid = level["UID"]?.ToString() ?? "";
+                        string author = level["Author"]?.ToString() ?? "";
+                        string name = level["Name"]?.ToString() ?? "";
+                        ulong workshopId = level["WorkshopID"]?.ToObject<ulong>() ?? 0;
+
+                        // Call your function
+                        PlaylistItem playlistItem = new PlaylistItem(uid, workshopId, name, author);
+                        MultiplayerApi.AddLevelToPlaylist(playlistItem, false);
+
+                        Log($"Added level {name} by {author} (UID={uid}, WorkshopID={workshopId})", LogLevel.Info);
+                        lastAuthor = author;
+                        lastTrack = name;
+                    }
+                    if(levels.Count > 1)
+                        sendMessenger("Added "+levels.Count+" tracks by "+lastAuthor+" to the playlist.", Plugin.Instance.messengerDuration.Value, LogLevel.Info);
+                    else
+                        sendMessenger("Added "+lastTrack+" by "+lastAuthor+" to the playlist.", Plugin.Instance.messengerDuration.Value, LogLevel.Info);
+                }
+                return true;
+            }
+            else if (status == "error")
+            {
+                Log("Server responded error"+data["message"]+"\n URL: "+workshopUrl, LogLevel.Error);
+                sendMessenger(data["message"].ToString(), Plugin.Instance.messengerDuration.Value, LogLevel.Error);
+                return false;
+            }
+            else
+            {
+                Log("Unknown Error \n URL: "+workshopUrl, LogLevel.Error);
+                sendMessenger("Error adding playlist item, please check the log.", Plugin.Instance.messengerDuration.Value, LogLevel.Error);
+                return false;
+            }
+        }
+        catch (HttpRequestException e)
+        {
+            Log("Request error: "+e.Message+"\n URL: "+workshopUrl, LogLevel.Error);
+            sendMessenger("Error adding playlist item, please check the log.", Plugin.Instance.messengerDuration.Value, LogLevel.Error);
+            return false;
+        }
+        catch (Exception e)
+        {
+            Log("Unexpected error: "+e.Message+"\n URL: "+workshopUrl, LogLevel.Error);
+            sendMessenger("Error adding playlist item, please check the log.", Plugin.Instance.messengerDuration.Value, LogLevel.Error);
+            return false;
+        }
+    }
+}
