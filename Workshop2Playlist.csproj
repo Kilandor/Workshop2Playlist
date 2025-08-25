@@ -3,13 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <Description>Workshop2Playlist</Description>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>
-      https://api.nuget.org/v3/index.json;
-      https://nuget.bepinex.dev/v3/index.json;
-      https://nuget.samboy.dev/v3/index.json
+      https://nuget.bepinex.dev/v3/index.json
     </RestoreAdditionalProjectSources>
     <PackageId>com.kilandor.zeepkist.workshop2playlist</PackageId>
     <Title>Workshop2Playlist</Title>

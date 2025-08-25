@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using BepInEx;
 using BepInEx.Logging;
 using Newtonsoft.Json.Linq;
 using ZeepkistClient;
@@ -23,10 +22,6 @@ public enum LogLevel
 public class Utilities
 {
     //Check to see if we are the host
-    public Utilities()
-    {
-    }
-
     public static bool IsOnlineHost()
     {
         return ZeepkistNetwork.IsConnectedToGame && ZeepkistNetwork.IsMasterClient;
@@ -73,13 +68,6 @@ public class Utilities
             { "prefix", prefix },
             { "message", "<color=" + messageColor + ">" + message + "</color>" }
         };
-    }
-
-    //wraper for Custom messages
-    public static void sendCustomChatMessage(bool everyone, ulong steamid = 0, string message = "",
-        string prefix = "")
-    {
-        ZeepkistNetwork.SendCustomChatMessage(everyone, steamid, message, prefix);
     }
     
     //handle working with On screen Messsages

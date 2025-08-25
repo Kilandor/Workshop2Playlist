@@ -1,27 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
-using Steamworks.Data;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using ZeepkistClient;
-using ZeepkistNetworking;
-using ZeepSDK.Multiplayer;
 using ZeepSDK.Scripting;
-using ZeepSDK.Storage;
 
 namespace Workshop2Playlist;
 
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 [BepInDependency("ZeepSDK")]
-[BepInDependency("Ztreamerbot")]
+[BepInDependency("com.metalted.zeepkist.Ztreamerbot")]
 public class Plugin : BaseUnityPlugin
 {
     private Harmony harmony;
