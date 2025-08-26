@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using BepInEx.Logging;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 using ZeepkistClient;
 using ZeepSDK.Messaging;
 using ZeepSDK.Multiplayer;
@@ -76,7 +77,7 @@ public class Utilities
         Dictionary<string, string> chatMessage = formatChatMessage(prefix, message);
         chatMessage["message"] = (usePrefix ? string.Join(",", chatMessage) : chatMessage["message"]);
         if(type == LogLevel.Info)
-            PlayerManager.Instance.messenger.Log(chatMessage["message"], duration);
+            PlayerManager.Instance.messenger.LogCustomColor(chatMessage["message"], duration,Color.white, new Color32(40, 167, 69, 255));
         else if(type == LogLevel.Error)
             PlayerManager.Instance.messenger.LogError(chatMessage["message"], duration);
     }
@@ -124,6 +125,7 @@ public class Utilities
                         sendMessenger("Added "+levels.Count+" tracks by "+lastAuthor+" to the playlist.", Plugin.Instance.messengerDuration.Value, LogLevel.Info);
                     else
                         sendMessenger("Added "+lastTrack+" by "+lastAuthor+" to the playlist.", Plugin.Instance.messengerDuration.Value, LogLevel.Info);
+                    MultiplayerApi.UpdateServerPlaylist();
                 }
                 return true;
             }
