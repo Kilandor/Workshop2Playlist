@@ -76,9 +76,9 @@ public class Utilities
         Dictionary<string, string> chatMessage = formatChatMessage(prefix, message);
         chatMessage["message"] = (usePrefix ? string.Join(",", chatMessage) : chatMessage["message"]);
         if(type == LogLevel.Info)
-            MessengerApi.LogSuccess(chatMessage["message"], duration);
+            PlayerManager.Instance.messenger.Log(chatMessage["message"], duration);
         else if(type == LogLevel.Error)
-            MessengerApi.LogError(chatMessage["message"], duration);
+            PlayerManager.Instance.messenger.LogError(chatMessage["message"], duration);
     }
 
     public static async Task<bool> addWorkshopItem(string workshopUrl)
