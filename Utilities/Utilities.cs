@@ -90,7 +90,7 @@ public class Utilities
         {
             // Fetch the API response
             HttpResponseMessage response = await client.GetAsync(apiUrlBase+Uri.EscapeDataString(workshopUrl));
-            response.EnsureSuccessStatusCode();
+            //response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
 
             // Parse JSON
@@ -129,7 +129,7 @@ public class Utilities
             }
             else if (status == "error")
             {
-                Log("Server responded error"+data["message"]+"\n URL: "+workshopUrl, LogLevel.Error);
+                Log("Server responded error: "+data["message"]+"\n URL: "+workshopUrl, LogLevel.Error);
                 sendMessenger(data["message"].ToString(), Plugin.Instance.messengerDuration.Value, LogLevel.Error);
                 return false;
             }
