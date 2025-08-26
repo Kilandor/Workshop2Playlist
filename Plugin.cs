@@ -9,7 +9,7 @@ namespace Workshop2Playlist;
 
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 [BepInDependency("ZeepSDK")]
-[BepInDependency("com.metalted.zeepkist.Ztreamerbot")]
+[BepInDependency("ZtreamerBot")]
 public class Plugin : BaseUnityPlugin
 {
     private Harmony harmony;
@@ -34,16 +34,9 @@ public class Plugin : BaseUnityPlugin
         // Plugin startup logic
         Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
         
-        
         //Register Events
         ZtreamerBot.Plugin.Instance.StreamerBotUDPAction += OnStreamerbotUDPEvent;
         
-        //Register Zua types
-        //ScriptingApi.RegisterType<List<PlaylistSaveJSON>>();
-       
-       //Register Zua Events
-       //ScriptingApi.RegisterEvent<OnLobbyTimerEvent>();
-       
        //Register Zua Functions
        ScriptingApi.RegisterFunction<ZuaFunctions.AddWorkshopItem>();
 
@@ -67,37 +60,35 @@ public class Plugin : BaseUnityPlugin
     }
     
     public static void OnStreamerbotUDPEvent(string json)
+    {
+        if (!Plugin.Instance.modEnabled.Value)
+            return;
+        
+        Utilities.Log($"Received StreamerBot message: {json}", LogLevel.Debug);
+        try
         {
-            //PlayerManager.Instance.currentMaster.setupScript.PlayerInputs.
-            // Example: log the message
-            Utilities.Log($"Received StreamerBot message: {json}", LogLevel.Debug);
+            var parsed = ZtreamerBot.Plugin.Instance.ParseUDPPayload(json);
+            parsed.TryGetValue("type", out var payloadTypeObj);
+            parsed.TryGetValue("action", out var payloadActionObj);
+            parsed.TryGetValue("value", out var payloadValueObj);
 
-            // Optional: parse it if needed
-            try
+            string payloadType = payloadTypeObj?.ToString();
+            string payloadAction = payloadActionObj?.ToString();
+            string payloadValue = payloadValueObj?.ToString();
+
+            if (payloadType == "workshop2playlist")
             {
-                var parsed = ZtreamerBot.Plugin.Instance.ParseUDPPayload(json);
-                parsed.TryGetValue("type", out var payloadTypeObj);
-                parsed.TryGetValue("action", out var payloadActionObj);
-                parsed.TryGetValue("value", out var payloadValueObj);
-
-                string payloadType = payloadTypeObj?.ToString();
-                string payloadAction = payloadActionObj?.ToString();
-                string payloadValue = payloadValueObj?.ToString();
-
-                if (payloadType == "workshop2playlist")
+                Utilities.Log($"Type: {payloadType} | Action: {payloadAction}", LogLevel.Debug);
+                if (payloadAction == "addWorkshopItem")// && Plugin.Instance.disableSteeringEnabled.Value)
                 {
-                    Utilities.Log($"Type: {payloadType} | Action: {payloadAction}", LogLevel.Debug);
-                    Utilities.Log("Players " + PlayerManager.Instance.currentMaster.carSetups[0].cc.playerNum, LogLevel.Debug);
-                    if (payloadAction == "addWorkshopItem")// && Plugin.Instance.disableSteeringEnabled.Value)
-                    {
-                        Utilities.addWorkshopItem(payloadValue);
-                    }
+                    Utilities.addWorkshopItem(payloadValue);
                 }
             }
-            catch (Exception ex)
-            {
-                Utilities.Log($"[MyPlugin] Failed to parse JSON: {ex.Message}", LogLevel.Error);
-            }
         }
+        catch (Exception ex)
+        {
+            Utilities.Log($"Failed to parse JSON: {ex.Message}", LogLevel.Error);
+        }
+    }
     
 }

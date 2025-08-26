@@ -18,11 +18,13 @@
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugType>full</DebugType>
+    <DocumentationFile>bin\Debug\Workshop2Playlist.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <DocumentationFile>bin\Release\Workshop2Playlist.xml</DocumentationFile>
   </PropertyGroup>
   
   <ItemGroup>

@@ -40,7 +40,7 @@ public class ZuaFunctions
         /// /// <param name="workshopUrl">The full url to the steam workshop item.</param>
         private void Implementation(string workshopUrl)
         {
-            if (!Utilities.IsOnlineHost())
+            if (!Utilities.IsOnlineHost() || !Plugin.Instance.modEnabled.Value)
             {
                 return;
             }
