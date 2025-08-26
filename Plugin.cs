@@ -61,7 +61,7 @@ public class Plugin : BaseUnityPlugin
     
     public static void OnStreamerbotUDPEvent(string json)
     {
-        if (!Plugin.Instance.modEnabled.Value)
+        if (!Utilities.IsOnlineHost() || !Plugin.Instance.modEnabled.Value)
             return;
         
         Utilities.Log($"Received StreamerBot message: {json}", LogLevel.Debug);
