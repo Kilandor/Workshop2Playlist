@@ -130,7 +130,7 @@ public partial class Utilities
             
             if (user != "" && rewardId != "" && redemptionId != "")
             {
-                argsObj["status"] = true;
+                argsObj["status"] = false;
                 ZtreamerBot.UDPBroadcast.Send(redemptionPayload);
             }
 
