@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
+using Newtonsoft.Json.Linq;
 using ZeepSDK.Scripting;
 
 namespace Workshop2Playlist;
@@ -63,31 +64,38 @@ public class Plugin : BaseUnityPlugin
     {
         if (!Utilities.IsOnlineHost() || !Plugin.Instance.modEnabled.Value)
             return;
-        
-        Utilities.Log($"Received StreamerBot message: {json}", LogLevel.Debug);
+    
+        Utilities.Log($"Received StreamerBot message: {json}", Utilities.LogLevel.Debug);
         try
         {
-            var parsed = ZtreamerBot.Plugin.Instance.ParseUDPPayload(json);
-            parsed.TryGetValue("type", out var payloadTypeObj);
-            parsed.TryGetValue("action", out var payloadActionObj);
-            parsed.TryGetValue("value", out var payloadValueObj);
+            var parsed = JObject.Parse(json);
+            foreach (var kvp in parsed)
+            {
+                Utilities.Log($"Key: {kvp.Key} => {kvp.Value}", Utilities.LogLevel.Debug);
+            }
 
-            string payloadType = payloadTypeObj?.ToString();
-            string payloadAction = payloadActionObj?.ToString();
-            string payloadValue = payloadValueObj?.ToString();
+            string payloadType   = parsed["type"]?.ToString();
+            string payloadAction = parsed["action"].ToString();
+            string payloadValue  = parsed["value"]?.ToString();
+            
+            // Extract user-related fields for error handling
+            string payloadUser = parsed["user"]?.ToString();
+            string payloadRewardId = parsed["rewardId"]?.ToString();
+            string payloadRedemptionId = parsed["redemptionId"]?.ToString();
 
+        
             if (payloadType == "workshop2playlist")
             {
-                Utilities.Log($"Type: {payloadType} | Action: {payloadAction}", LogLevel.Debug);
-                if (payloadAction == "addWorkshopItem")// && Plugin.Instance.disableSteeringEnabled.Value)
+                Utilities.Log($"Type: {payloadType} | Action: {payloadAction}", Utilities.LogLevel.Debug);
+                if (payloadAction == "addWorkshopItem")
                 {
-                    Utilities.addWorkshopItem(payloadValue);
+                    Utilities.addWorkshopItem(payloadValue, payloadUser, payloadRewardId, payloadRedemptionId);
                 }
             }
         }
         catch (Exception ex)
         {
-            Utilities.Log($"Failed to parse JSON: {ex.Message}", LogLevel.Error);
+            Utilities.Log($"Failed to parse JSON: {ex.Message}", Utilities.LogLevel.Error);
         }
     }
     

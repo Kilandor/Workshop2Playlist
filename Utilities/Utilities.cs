@@ -43,9 +43,12 @@ public partial class Utilities
             PlayerManager.Instance.messenger.LogError(chatMessage["message"], duration);
     }
 
-    public static async Task<bool> addWorkshopItem(string workshopUrl)
+    public static async Task<bool> addWorkshopItem(string workshopUrl, string user = "", string rewardId = "", string redemptionId = "")
     {
         string apiUrlBase = "https://zeepkist.kilandor.com/workshop2playlist/index.php?workshopUrl=";
+        Uri uri = new Uri(workshopUrl);
+        var query = HttpUtility.ParseQueryString(uri.Query);
+        
         using HttpClient client = new HttpClient();
         client.Timeout = TimeSpan.FromSeconds(60);
         try
@@ -60,6 +63,23 @@ public partial class Utilities
 
             // Extract Steam status
             string status = data["status"]?.ToString();
+            
+            // Build payload for Streamer.bot
+            var argsObj = new JObject
+            {
+                ["user"] = user,
+                ["rewardId"] = rewardId,
+                ["redemptionId"] = redemptionId,
+                ["workshopId"] = query["id"]
+            };
+
+            var redemptionPayload = new JObject
+            {
+                ["request"] = "DoAction",
+                ["action"] = new JObject { ["name"] = "W2PHandleRedmptionStatus" },
+                ["args"] = argsObj
+            };
+            
             if (status == "success")
             {
                 JArray levels = (JArray?)data["levels"];
@@ -86,22 +106,35 @@ public partial class Utilities
                         sendMessenger("Added "+levels.Count+" tracks by "+lastAuthor+" to the playlist.", Plugin.Instance.messengerDuration.Value, LogLevel.Info);
                     else
                         sendMessenger("Added "+lastTrack+" by "+lastAuthor+" to the playlist.", Plugin.Instance.messengerDuration.Value, LogLevel.Info);
+                   
+                    
                     MultiplayerApi.UpdateServerPlaylist();
+                    if (user != "" && rewardId != "" && redemptionId != "")
+                    {
+                        argsObj["status"] = true;
+                        ZtreamerBot.UDPBroadcast.Send(redemptionPayload);
+                    }
+                    return true;
                 }
-                return true;
             }
             else if (status == "error")
             {
                 Log("Server responded error: "+data["message"]+"\n URL: "+workshopUrl, LogLevel.Error);
                 sendMessenger(data["message"].ToString(), Plugin.Instance.messengerDuration.Value, LogLevel.Error);
-                return false;
             }
             else
             {
                 Log("Unknown Error \n URL: "+workshopUrl, LogLevel.Error);
                 sendMessenger("Error adding playlist item, please check the log.", Plugin.Instance.messengerDuration.Value, LogLevel.Error);
-                return false;
             }
+            
+            if (user != "" && rewardId != "" && redemptionId != "")
+            {
+                argsObj["status"] = true;
+                ZtreamerBot.UDPBroadcast.Send(redemptionPayload);
+            }
+
+            return false;
         }
         catch (HttpRequestException e)
         {
