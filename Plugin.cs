@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
@@ -14,7 +14,7 @@ public class Plugin : BaseUnityPlugin
 {
     private Harmony harmony;
     public static Plugin Instance;
-    public static ManualLogSource Logger;
+    public static ManualLogSource baseLogger;
     
     public ConfigEntry<bool> modEnabled;
     public ConfigEntry<bool> debugEnabled;
@@ -28,7 +28,7 @@ public class Plugin : BaseUnityPlugin
         harmony.PatchAll();
         
         Instance = this;
-        Logger = base.Logger;
+        baseLogger = Logger;
         ConfigSetup();
         
         // Plugin startup logic

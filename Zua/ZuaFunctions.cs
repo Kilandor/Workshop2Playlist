@@ -1,10 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using FMOD.Studio;
-using UnityEngine;
-using ZeepkistClient;
-using ZeepSDK.Scripting;
 using ZeepSDK.Scripting.ZUA;
 
 namespace Workshop2Playlist;
@@ -45,7 +39,7 @@ public class ZuaFunctions
                 return;
             }
             
-            Utilities.Log("Zua Adding workshop item "+workshopUrl, LogLevel.Info);
+            Utilities.Log("Zua Adding workshop item "+workshopUrl, Utilities.LogLevel.Info);
 
             Utilities.addWorkshopItem(workshopUrl);
 

@@ -2,58 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using BepInEx.Logging;
+using System.Web;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using ZeepkistClient;
-using ZeepSDK.Messaging;
 using ZeepSDK.Multiplayer;
-using static Workshop2Playlist.Plugin;
 
 namespace Workshop2Playlist;
-
-public enum LogLevel
-{
-    Info = 0,
-    Warning = 1,
-    Debug = 2,
-    Error = 3
-}
-
-public class Utilities
+public partial class Utilities
 {
     //Check to see if we are the host
     public static bool IsOnlineHost()
     {
         return ZeepkistNetwork.IsConnectedToGame && ZeepkistNetwork.IsMasterClient;
-    }
-    
-    /*
-     * Level 0 - info/normal
-     * Level 1 - Warning
-     * Level 2 - Debug
-     * Level 3 - Error
-     */
-    public static void Log(string message, LogLevel level = LogLevel.Info)
-    {
-        ManualLogSource Logger = Plugin.Logger;
-        switch (level)
-        {
-            default:
-            case LogLevel.Info:
-                Logger.LogInfo(message);
-                break;
-            case LogLevel.Warning:
-                Logger.LogWarning(message);
-                break;
-            case LogLevel.Debug:
-                if (Instance.debugEnabled.Value)
-                    Logger.LogDebug(message);
-                break;
-            case LogLevel.Error:
-                Logger.LogError(message);
-                break;
-        }
     }
     
     //quickly format chat messages
