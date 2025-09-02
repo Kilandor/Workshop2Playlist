@@ -21,6 +21,7 @@ public class Plugin : BaseUnityPlugin
     public ConfigEntry<bool> debugEnabled;
     
     public ConfigEntry<float> messengerDuration;
+    public ConfigEntry<int> maxPackLimit;
     
 
     private void Awake()
@@ -53,8 +54,8 @@ public class Plugin : BaseUnityPlugin
     {
         modEnabled = Config.Bind("1. General", "Plugin Enabled", true, "Is the plugin currently enabled?");
         messengerDuration = Config.Bind("1. General", "Messenger duration", 5f, "How long the message shows up for.");
-        
-        //hostName = Config.Bind("2. Host", "Hostname", "Lobby", "Hostname to use for messages for the server.");
+        maxPackLimit = Config.Bind("1. General", "Maximum pack import", 5,
+            "The maximum number of tracks from a pack to import, will picked randomly.");
         
         debugEnabled = Config.Bind("9. Dev / Debug", "Debug Logs", false, "Provides extra output in logs for troubleshooting.");
         

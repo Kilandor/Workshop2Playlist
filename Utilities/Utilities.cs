@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using UnityEngine;
 using ZeepkistClient;
 using ZeepSDK.Multiplayer;
+using Random = UnityEngine.Random;
 
 namespace Workshop2Playlist;
 public partial class Utilities
@@ -87,6 +88,14 @@ public partial class Utilities
                 {
                     string lastAuthor = "";
                     string lastTrack = "";
+                    if (levels.Count > Plugin.Instance.maxPackLimit.Value)
+                    {
+                        while (levels.Count > Plugin.Instance.maxPackLimit.Value)
+                        {
+                            int index = UnityEngine.Random.Range(0, levels.Count);
+                            levels.RemoveAt(index);
+                        }
+                    }
                     foreach (JObject level in levels)
                     {
                         string uid = level["UID"]?.ToString() ?? "";
