@@ -9,8 +9,9 @@ ZtreamerBot [Mod.io]() - [Github](https://github.com/Kilandor/ZtreamerBot)
 - Auto add track to the playlist from workshop links<br />
 ![](https://zeepkist.kilandor.com/mods/workshop2playlist/images/added_tracks.png)
 ![](https://zeepkist.kilandor.com/mods/workshop2playlist/images/added_tracks_2.png)
-- Integration wtih Ztreamer to allow for automatic redeems with channel points or commands. This is utiulized through Streamerbot
-- Integration with Zua for ingame commands for submission
+- Integration wtih Ztreamer to allow for automatic redeems with channel points or commands. This is utilized through Streamerbot
+- Integration with Zua for in game commands for submission
+- Configure the maximum numb of tracks to import from packs, then they are randomly selected 
 
 ## Streamer.bot Setup
 1. Import **Workshop2Playlist.sb** this file can be found in examples. This will add the Actions and Commands.
@@ -20,7 +21,7 @@ ZtreamerBot [Mod.io]() - [Github](https://github.com/Kilandor/ZtreamerBot)
 5. Now open **ToggleAddWorkshopItem** do the similar edit for **Reward Get Info** and **Reward Set Enabled** set these to your track request reward.
 6. Now goto Servers/Clients > UDP Server set **Port** to **12334** Recommended to set **Auto Start** to on, or you will have to manually start it.
 7. The default cooldown is 15 seconds this can be configured in **Global Variables** it is **w2p_cooldown** this value is in miliseconds (1000 = 1 second). If it doesn't show up you can goto Action > **Startup Disable Rewards** and run a test trigger it will create it.
-8. Now goto Commands and enable the **!toggleTrackRequest** command. Its set to allow moderators, you can use **!toggleTrackRequest**, **!toggletrackrequest** or **!ttr**. Track request are auto-disabled on start up, or on starting a stream.
+8. Now go to Commands and enable the **!toggleTrackRequest** command. Its set to allow moderators, you can use **!toggleTrackRequest**, **!toggletrackrequest** or **!ttr**. Track request are auto-disabled on start up, or on starting a stream.
 9. Simply use **!ttr** to enable it and try it out
 
 
