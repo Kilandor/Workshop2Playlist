@@ -2,8 +2,9 @@
 Mod for Zeepkist to bring simplified track requests from the community to the host. Automatically adds them to the playlist without any need to any input from the host.
 
 ## Dependencies
-ZeepSDK [Mod.io](https://mod.io/g/zeepkist/m/zeepsdk) - [Github](https://github.com/donderjoekel/ZeepSDK/)<br>
-ZtreamerBot [Mod.io]() - [Github](https://github.com/Kilandor/ZtreamerBot)
+ZeepSDK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Mod.io](https://mod.io/g/zeepkist/m/zeepsdk) - [Github](https://github.com/donderjoekel/ZeepSDK/)<br>
+Room Service&nbsp;&nbsp;&nbsp;[Mod.io](https://mod.io/g/zeepkist/m/room-service) - [Github](https://github.com/Kilandor/RoomService)<br>
+ZtreamerBot&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Mod.io](https://mod.io/g/zeepkist/m/ztreamerbot) - [Github](https://github.com/Kilandor/ZtreamerBot)
 
 ## Features
 - Auto add track to the playlist from workshop links<br />
