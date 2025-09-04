@@ -6,12 +6,14 @@ using System.Web;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using ZeepkistClient;
+using ZeepSDK.Messaging;
 using ZeepSDK.Multiplayer;
 using Random = UnityEngine.Random;
 
 namespace Workshop2Playlist;
 public partial class Utilities
 {
+    public static ITaggedMessenger messenger = MessengerApi.CreateTaggedMessenger("W2P");
     //Check to see if we are the host
     public static bool IsOnlineHost()
     {
@@ -34,14 +36,14 @@ public partial class Utilities
     }
     
     //handle working with On screen Messsages
-    public static void sendMessenger(string message, float duration, LogLevel type, string prefix = "",  bool usePrefix = false)
+    public static void sendMessenger(string message, float duration, LogLevel type)
     {
-        Dictionary<string, string> chatMessage = formatChatMessage(prefix, message);
-        chatMessage["message"] = (usePrefix ? string.Join(",", chatMessage) : chatMessage["message"]);
         if(type == LogLevel.Info)
-            PlayerManager.Instance.messenger.LogCustomColor(chatMessage["message"], duration,Color.white, new Color32(40, 167, 69, 255));
-        else if(type == LogLevel.Error)
-            PlayerManager.Instance.messenger.LogError(chatMessage["message"], duration);
+            messenger.LogSuccess(message, duration);
+        else if(type == LogLevel.Warning)
+            messenger.LogWarning(message, duration);
+        else if(type == LogLevel.Error || type == LogLevel.Debug)
+            messenger.LogError(message, duration);
     }
 
     public static async Task<bool> addWorkshopItem(string workshopUrl, string user = "", string rewardId = "", string redemptionId = "")
