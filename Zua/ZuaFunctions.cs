@@ -5,9 +5,6 @@ namespace Workshop2Playlist;
 
 public class ZuaFunctions
 {
-    /// <summary>
-    /// Closes the server
-    /// </summary>
     public class AddWorkshopItem : ILuaFunction
     {
         /// <summary>
@@ -41,7 +38,7 @@ public class ZuaFunctions
             
             Utilities.Log("Zua Adding workshop item "+workshopUrl, Utilities.LogLevel.Info);
 
-            Utilities.addWorkshopItem(workshopUrl);
+            Plugin.Core.addWorkshopItem(workshopUrl);
 
         }
     }

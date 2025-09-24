@@ -4,6 +4,10 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
+using Workshop2Playlist.Commands;
+using ZeepSDK.ChatCommands;
+using ZeepSDK.Racing;
 using ZeepSDK.Scripting;
 
 namespace Workshop2Playlist;
@@ -15,6 +19,7 @@ public class Plugin : BaseUnityPlugin
 {
     private Harmony harmony;
     public static Plugin Instance;
+    public static W2PCore Core;
     public static ManualLogSource baseLogger;
     
     public ConfigEntry<bool> modEnabled;
@@ -23,6 +28,8 @@ public class Plugin : BaseUnityPlugin
     public ConfigEntry<float> messengerDuration;
     public ConfigEntry<int> maxPackLimit;
     
+    public static ConfigEntry<KeyCode> keyQueueNext { get; private set; }
+    
 
     private void Awake()
     {
@@ -30,18 +37,21 @@ public class Plugin : BaseUnityPlugin
         harmony.PatchAll();
         
         Instance = this;
+        Core = new W2PCore();
         baseLogger = Logger;
         ConfigSetup();
         
-        // Plugin startup logic
-        Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
+        //Register Chat Commands
+        ChatCommandApi.RegisterLocalChatCommand<ResetRequestQueue>();
         
+        RacingApi.LevelLoaded += Core.levelLoaded;
         //Register Events
         ZtreamerBot.Plugin.Instance.StreamerBotUDPAction += OnStreamerbotUDPEvent;
         
-       //Register Zua Functions
-       ScriptingApi.RegisterFunction<ZuaFunctions.AddWorkshopItem>();
-
+        //Register Zua Functions
+        ScriptingApi.RegisterFunction<ZuaFunctions.AddWorkshopItem>();
+       
+        Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
     }
 
     private void OnDestroy()
@@ -57,6 +67,8 @@ public class Plugin : BaseUnityPlugin
         maxPackLimit = Config.Bind("1. General", "Maximum pack import", 5,
             "The maximum number of tracks from a pack to import, will picked randomly.");
         
+        keyQueueNext = Config.Bind("2. Keys", "queueNext", KeyCode.Keypad5, "Key to press to queue the next reqeust track.");
+        
         debugEnabled = Config.Bind("9. Dev / Debug", "Debug Logs", false, "Provides extra output in logs for troubleshooting.");
         
     }
@@ -70,10 +82,7 @@ public class Plugin : BaseUnityPlugin
         try
         {
             var parsed = JObject.Parse(json);
-            foreach (var kvp in parsed)
-            {
-                Utilities.Log($"Key: {kvp.Key} => {kvp.Value}", Utilities.LogLevel.Debug);
-            }
+            Utilities.Log($"Payload: {parsed}", Utilities.LogLevel.Debug);
 
             string payloadType   = parsed["type"]?.ToString();
             string payloadAction = parsed["action"].ToString();
@@ -88,9 +97,17 @@ public class Plugin : BaseUnityPlugin
             if (payloadType == "workshop2playlist")
             {
                 Utilities.Log($"Type: {payloadType} | Action: {payloadAction}", Utilities.LogLevel.Debug);
-                if (payloadAction == "addWorkshopItem")
+                switch (payloadAction)
                 {
-                    Utilities.addWorkshopItem(payloadValue, payloadUser, payloadRewardId, payloadRedemptionId);
+                    case "addWorkshopItem":
+                        Core.addWorkshopItem(payloadValue, payloadUser, payloadRewardId, payloadRedemptionId);
+                        break;
+                    case "queueNext":
+                        Core.queueNextRequest();
+                        break;
+                    case "queueReset":
+                        Core.resetRequestQueue();
+                        break;
                 }
             }
         }
@@ -100,4 +117,12 @@ public class Plugin : BaseUnityPlugin
         }
     }
     
+    
+    private void Update()
+    {
+        if (Input.GetKeyDown(keyQueueNext.Value))
+        {
+            Core.queueNextRequest();
+        }
+    }
 }

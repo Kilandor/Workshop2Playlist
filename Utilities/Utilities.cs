@@ -1,19 +1,15 @@
-using System;
 using System.Collections.Generic;
-using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
-using Newtonsoft.Json.Linq;
-using UnityEngine;
 using ZeepkistClient;
 using ZeepSDK.Messaging;
-using ZeepSDK.Multiplayer;
-using Random = UnityEngine.Random;
 
 namespace Workshop2Playlist;
 public partial class Utilities
 {
     public static ITaggedMessenger messenger = MessengerApi.CreateTaggedMessenger("W2P");
+    private static readonly SemaphoreSlim messengerQueue = new SemaphoreSlim(1, 1);
+    
     //Check to see if we are the host
     public static bool IsOnlineHost()
     {
@@ -36,128 +32,24 @@ public partial class Utilities
     }
     
     //handle working with On screen Messsages
-    public static void sendMessenger(string message, float duration, LogLevel type)
+    public static async Task sendMessenger(string message, float duration, LogLevel type)
     {
-        if(type == LogLevel.Info)
-            messenger.LogSuccess(message, duration);
-        else if(type == LogLevel.Warning)
-            messenger.LogWarning(message, duration);
-        else if(type == LogLevel.Error || type == LogLevel.Debug)
-            messenger.LogError(message, duration);
-    }
-
-    public static async Task<bool> addWorkshopItem(string workshopUrl, string user = "", string rewardId = "", string redemptionId = "")
-    {
-        string apiUrlBase = "https://zeepkist.kilandor.com/workshop2playlist/index.php?workshopUrl=";
-        Uri uri = new Uri(workshopUrl);
-        var query = HttpUtility.ParseQueryString(uri.Query);
-        
-        using HttpClient client = new HttpClient();
-        client.Timeout = TimeSpan.FromSeconds(60);
+        // Ensure only one call runs at a time
+        await messengerQueue.WaitAsync();
         try
         {
-            // Fetch the API response
-            HttpResponseMessage response = await client.GetAsync(apiUrlBase+Uri.EscapeDataString(workshopUrl));
-            //response.EnsureSuccessStatusCode();
-            string responseBody = await response.Content.ReadAsStringAsync();
-
-            // Parse JSON
-            JObject data = JObject.Parse(responseBody);
-
-            // Extract Steam status
-            string status = data["status"]?.ToString();
-            
-            // Build payload for Streamer.bot
-            var argsObj = new JObject
-            {
-                ["user"] = user,
-                ["rewardId"] = rewardId,
-                ["redemptionId"] = redemptionId,
-                ["workshopId"] = query["id"]
-            };
-
-            var redemptionPayload = new JObject
-            {
-                ["request"] = "DoAction",
-                ["action"] = new JObject { ["name"] = "W2PHandleRedmptionStatus" },
-                ["args"] = argsObj
-            };
-            
-            if (status == "success")
-            {
-                JArray levels = (JArray?)data["levels"];
-                if (levels != null)
-                {
-                    string lastAuthor = "";
-                    string lastTrack = "";
-                    if (levels.Count > Plugin.Instance.maxPackLimit.Value)
-                    {
-                        while (levels.Count > Plugin.Instance.maxPackLimit.Value)
-                        {
-                            int index = UnityEngine.Random.Range(0, levels.Count);
-                            levels.RemoveAt(index);
-                        }
-                    }
-                    foreach (JObject level in levels)
-                    {
-                        string uid = level["UID"]?.ToString() ?? "";
-                        string author = level["Author"]?.ToString() ?? "";
-                        string name = level["Name"]?.ToString() ?? "";
-                        ulong workshopId = level["WorkshopID"]?.ToObject<ulong>() ?? 0;
-
-                        // Call your function
-                        PlaylistItem playlistItem = new PlaylistItem(uid, workshopId, name, author);
-                        MultiplayerApi.AddLevelToPlaylist(playlistItem, false);
-
-                        Log($"Added level {name} by {author} (UID={uid}, WorkshopID={workshopId})", LogLevel.Info);
-                        lastAuthor = author;
-                        lastTrack = name;
-                    }
-                    if(levels.Count > 1)
-                        sendMessenger("Added "+levels.Count+" tracks by "+lastAuthor+" to the playlist.", Plugin.Instance.messengerDuration.Value, LogLevel.Info);
-                    else
-                        sendMessenger("Added "+lastTrack+" by "+lastAuthor+" to the playlist.", Plugin.Instance.messengerDuration.Value, LogLevel.Info);
-                   
-                    
-                    MultiplayerApi.UpdateServerPlaylist();
-                    if (user != "" && rewardId != "" && redemptionId != "")
-                    {
-                        argsObj["status"] = true;
-                        ZtreamerBot.UDPBroadcast.Send(redemptionPayload);
-                    }
-                    return true;
-                }
-            }
-            else if (status == "error")
-            {
-                Log("Server responded error: "+data["message"]+"\n URL: "+workshopUrl, LogLevel.Error);
-                sendMessenger(data["message"].ToString(), Plugin.Instance.messengerDuration.Value, LogLevel.Error);
-            }
-            else
-            {
-                Log("Unknown Error \n URL: "+workshopUrl, LogLevel.Error);
-                sendMessenger("Error adding playlist item, please check the log.", Plugin.Instance.messengerDuration.Value, LogLevel.Error);
-            }
-            
-            if (user != "" && rewardId != "" && redemptionId != "")
-            {
-                argsObj["status"] = false;
-                ZtreamerBot.UDPBroadcast.Send(redemptionPayload);
-            }
-
-            return false;
+            if (type == LogLevel.Info)
+                messenger.LogSuccess(message, duration);
+            else if (type == LogLevel.Warning)
+                messenger.LogWarning(message, duration);
+            else if (type == LogLevel.Error || type == LogLevel.Debug)
+                messenger.LogError(message, duration);
+            //wait duration of the message + 100ms to ensure it is gone
+            await Task.Delay(((int)duration * (1000)+100)); 
         }
-        catch (HttpRequestException e)
+        finally
         {
-            Log("Request error: "+e.Message+"\n URL: "+workshopUrl, LogLevel.Error);
-            sendMessenger("Error adding playlist item, please check the log.", Plugin.Instance.messengerDuration.Value, LogLevel.Error);
-            return false;
-        }
-        catch (Exception e)
-        {
-            Log("Unexpected error: "+e.Message+"\n URL: "+workshopUrl, LogLevel.Error);
-            sendMessenger("Error adding playlist item, please check the log.", Plugin.Instance.messengerDuration.Value, LogLevel.Error);
-            return false;
+            messengerQueue.Release();
         }
     }
 }
