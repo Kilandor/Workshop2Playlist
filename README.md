@@ -8,14 +8,20 @@ ZtreamerBot&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Mod.io](https://mod.io/g/zeepkist/m/zt
 
 ## Features
 - Auto add track to the playlist from workshop links<br />
-![](https://zeepkist.kilandor.com/mods/workshop2playlist/images/added_tracks.png)
-![](https://zeepkist.kilandor.com/mods/workshop2playlist/images/added_tracks_2.png)
+  ![](https://zeepkist.kilandor.com/mods/workshop2playlist/images/added_tracks.png)
+  ![](https://zeepkist.kilandor.com/mods/workshop2playlist/images/added_tracks_2.png)
 - Integration with Ztreamer to allow for automatic redeems with channel points or commands. This is utilized through Streamerbot
 - Integration with Zua for in game commands for submission
-- Configure the maximum number of tracks to import from packs, then they are randomly selected 
+- Configure the maximum number of tracks to import from packs, then they are randomly selected
+- Prevent duplicate tracks
+- Queue the next requested track with a button in-game, Stream Deck, or streamer.bot action.
+
+## Updating to a new version
+Generally you won't need to do anything, however if there is an update to the Streamer.bot actions.
+If there is an update you need to repeat steps **4**, **5** and **8** of the **Streamer.bot Setup**
 
 ## Streamer.bot Setup
-1. Import **Workshop2Playlist.sb** this file can be found in examples. This will add the Actions and Commands.
+1. Import **[Workshop2Playlist.sb](Examples/Workshop2Playlist.sb)** this file can be found in examples. This will add the Actions and Commands.
 2. Goto Platforms > Twitch > **Channel Point Rewards**
 3. Create a new reward name doesn't matter, but leave the setting **Redemption Skips Queue** off, and **User Input Required** on.
 4. Go to Actions > **Startup Disable Rewards** edit sub-action for **Reward Set Enabled State** chose your track request reward.
@@ -28,17 +34,16 @@ ZtreamerBot&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Mod.io](https://mod.io/g/zeepkist/m/zt
 ## Stream Deck Setup
 1. Use the [Elgato Marketplace](https://marketplace.elgato.com/product/streamerbot-5c942a07-4bf6-4207-a2f2-f8599c398f2a) to install the Streamer.bot plugin.
 2. In Streamer.bot goto Integrations > Elgato Stream Deck > Turn on **Auto Start** and press **Start Server**
-3. In Stream Deck, add a Streamer.bot > **Status Indicator** button. 
-4. Edit the button and find **Streamer.bot: Any connection** click the ⚙️ button. Then simply click **New** and then just click save.
-5. Now scroll to the bottom and find **Import** and then open **Examples\Stream Deck.txt** copy the data inside the file and paste it in, and choose import.
+3. In Stream Deck, add a Streamer.bot > **Status Indicator** button.
+4. Edit the button and find **Streamer.bot: No Instance Found** click the ⚙️ button. Then simply click **New** and then just click **Save**.
+5. Now scroll to the bottom and find **Import** and then open **[Stream Deck.txt](Examples/StreamDeck.txt)** copy the data inside the file and paste it in, and choose import.
 6. Now simply reqeust some tracks and try it out.
 
 ## Zua Setup
 So this is more complex as it requires coding, but it is possible.<br>
-An example script can be found in **Examples\workshop2playlist.lua**<br>
+This is an example script, it can also be found in the examples folder **[workshop2playlist.lua](Examples/workshop2playlist.lua)**<br>
 Also without a mod such as **ChatUtils** the URL would have to be manually typed it currently.<br><br>
 The ZUA function for this is **Workshop2Playlist.AddWorkshopItem(url)** this currently provides no response as the backend request has to operate asynchronous.
 
 ## Commands
-
-- /w2p reset - This command clears the reset queue, and resets the information with Streamer.bot and Stream Deck. This should only need to be used if you have loaded a new playlist but had requests remaining.
+- **/w2p reset** - This command clears the reset queue, and resets the information with next queue button, also for Streamer.bot and Stream Deck. This should only need to be used if you have loaded a new playlist but had requests remaining.
