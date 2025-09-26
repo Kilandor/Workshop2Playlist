@@ -179,7 +179,7 @@ public class W2PCore
         }
     }
 
-    public void queueNextRequest()
+    public void nextRequestQueue()
     {
         if (requestQueue.Count == 0)
         {
@@ -196,7 +196,7 @@ public class W2PCore
         }
 
         MultiplayerApi.SetNextLevelIndex(request.index);
-        Utilities.sendMessenger($"Requested track {request.name} queued next.", Plugin.Instance.messengerDuration.Value, Utilities.LogLevel.Error);
+        Utilities.sendMessenger($"Requested track {request.name} queued next.", Plugin.Instance.messengerDuration.Value, Utilities.LogLevel.Info);
     }
     
     public static async Task asyncUpdateServerPlaylist()
@@ -251,6 +251,21 @@ public class W2PCore
     {
         requestQueue.Clear();
         updateRequestQueueCount();
+    }
+    
+    private bool skipNextCooldown;
+    public async Task skipNextRequestQueue()
+    {
+        if (requestQueue.Count == 0 || skipNextCooldown)
+            return;
+        
+        skipNextCooldown = true;
+        
+        requestQueue.RemoveAt(0);
+        updateRequestQueueCount();
+        
+        await Task.Delay(2000);
+        skipNextCooldown = false;
     }
     
 }
