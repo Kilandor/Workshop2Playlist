@@ -3,10 +3,10 @@ Copy the large block of text
 Track Queue
 ---------------------------
 
-{"version":"1.1.1.2","action":"bot.streamer.streamdeck.status","settings":{"id":"3EVAPAWvhyYBBQ8VISPAg","title":{"0":"Track\nQueue"},"backgroundSrcMap":{"0":""},"backgroundColorMap":{"0":"#ffaa00"},"keyDownAction":{"id":"91fb10b8-8bb3-4056-a37d-69e679400055","name":"QueueReset","args":[]},"keyUpAction":{"id":"","name":"","args":[]},"keyDownLongAction":{"id":"","name":"","args":[]},"rotateAction":{"id":"","name":"","args":[]},"dialPressAction":{"id":"","name":"","args":[]},"dialReleaseAction":{"id":"","name":"","args":[]},"touchTapAction":{"id":"","name":"","args":[]},"touchLongAction":{"id":"","name":"","args":[]},"type":"sparkline","textColor":"#dcdcdc","chartSteps":16}}
+{"version":"1.1.1.2","action":"bot.streamer.streamdeck.status","settings":{"id":"3EVAPAWvhyYBBQ8VISPAg","title":{"0":"Track\nQueue"},"backgroundSrcMap":{"0":""},"backgroundColorMap":{"0":"#ffaa00"},"keyDownAction":{"id":"1421036b-627f-4cfb-86dc-f23545b0a94b","name":"QueueNext","args":[]},"keyUpAction":{"id":"","name":"","args":[]},"keyDownLongAction":{"id":"","name":"","args":[]},"rotateAction":{"id":"","name":"","args":[]},"dialPressAction":{"id":"","name":"","args":[]},"dialReleaseAction":{"id":"","name":"","args":[]},"touchTapAction":{"id":"","name":"","args":[]},"touchLongAction":{"id":"","name":"","args":[]},"type":"sparkline","textColor":"#dcdcdc","chartSteps":16}}
 
 ---------------------------
 Skip Next Track Request
 ---------------------------
 
-{"version":"1.1.1.2","action":"bot.streamer.streamdeck.action","settings":{"id":"Ygg12-198O5195u1_FzoC","title":{"0":"Skip Next\n\nTrack \nRequest"},"backgroundSrcMap":{"0":""},"backgroundColorMap":{"0":null},"keyDownAction":{"id":"1421036b-627f-4cfb-86dc-f23545b0a94b","name":"QueueNext","args":[]},"keyUpAction":{"id":"","name":"","args":[]},"keyDownLongAction":{"id":"","name":"","args":[]}}}
+{"version":"1.1.1.2","action":"bot.streamer.streamdeck.action","settings":{"id":"Ygg12-198O5195u1_FzoC","title":{"0":"Skip Next\n\nTrack \nRequest"},"backgroundSrcMap":{"0":""},"backgroundColorMap":{"0":null},"keyDownAction":{"id":"f4ddba3e-e266-4d32-94a5-dbac3de8c2c7","name":"QueueSkipNext","args":[]},"keyUpAction":{"id":"","name":"","args":[]},"keyDownLongAction":{"id":"","name":"","args":[]}}}

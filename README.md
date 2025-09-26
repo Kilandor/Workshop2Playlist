@@ -40,7 +40,7 @@ The commands will disable when updated, so you will need to enable them again if
 2. In Streamer.bot goto Integrations > Elgato Stream Deck > Turn on **Auto Start** and press **Start Server**
 3. In Stream Deck, add a Streamer.bot > **Status Indicator** button, and a **Action** button.
 4. Edit the **Status Indicator** button and find **Streamer.bot: No Instance Found** click the ⚙️ button. Then simply click **New** and then just click **Save**. (you only need to do this for one button)
-5. Now scroll to the bottom and find **Import** and then open **[Stream Deck.txt](Examples/StreamDeck.txt)** it has two sections find the **Track Queue** block and copy the data and paste it in, and choose import.
+5. Now scroll to the bottom and find **Import** and then open **[StreamDeck.txt](Examples/StreamDeck.txt)** it has two sections find the **Track Queue** block and copy the data and paste it in, and choose import.
 6. Repeat the same process in step 5, for the **Action** button, using the **Skip Next Track Request** data
 6. Now simply request some tracks and try it out.
 
