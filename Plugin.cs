@@ -43,6 +43,8 @@ public class Plugin : BaseUnityPlugin
         
         //Register Chat Commands
         ChatCommandApi.RegisterLocalChatCommand<ResetRequestQueue>();
+        ChatCommandApi.RegisterLocalChatCommand<SkipNextRequestQueue>();
+        ChatCommandApi.RegisterLocalChatCommand<NextRequestQueue>();
         
         RacingApi.LevelLoaded += Core.levelLoaded;
         //Register Events
@@ -103,7 +105,10 @@ public class Plugin : BaseUnityPlugin
                         Core.addWorkshopItem(payloadValue, payloadUser, payloadRewardId, payloadRedemptionId);
                         break;
                     case "queueNext":
-                        Core.queueNextRequest();
+                        Core.nextRequestQueue();
+                        break;
+                    case "queueSkipNext":
+                        Core.skipNextRequestQueue();
                         break;
                     case "queueReset":
                         Core.resetRequestQueue();
@@ -122,7 +127,7 @@ public class Plugin : BaseUnityPlugin
     {
         if (Input.GetKeyDown(keyQueueNext.Value))
         {
-            Core.queueNextRequest();
+            Core.nextRequestQueue();
         }
     }
 }
